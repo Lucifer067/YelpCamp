@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 const methodOverride = require('method-override');
 const path = require('path');
 const session= require('express-session');
-const MongoDBStore= require('connect-mongo')(session);
+const MongoDBStore= require('connect-mongo').default;
 const flash= require('connect-flash');
 const ejsMate = require('ejs-mate');
 const passport= require('passport');
@@ -56,7 +56,7 @@ app.use(mongoSanitize({
 
 const secret= process.env.SECRET || 'thisshouldbeabettersecret';
 
-const store= new MongoDBStore({
+const store= MongoDBStore.create({
     url:dbUrl, 
     secret,
     touchAfter: 24* 3600
