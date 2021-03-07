@@ -8,7 +8,6 @@ const mongoose = require('mongoose');
 const methodOverride = require('method-override');
 const path = require('path');
 const session= require('express-session');
-const MongoDBStore= require('connect-mongo').default;
 const flash= require('connect-flash');
 const ejsMate = require('ejs-mate');
 const passport= require('passport');
@@ -27,6 +26,8 @@ const ExpressError= require('./utils/ExpressError');
 const campgroundRoutes= require('./routes/campground');
 const reviewRoutes= require('./routes/reviews');
 const userRoutes= require('./routes/users');
+
+const MongoDBStore = require("connect-mongo")(session);
 
 const dbUrl= process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp';
 
@@ -56,10 +57,10 @@ app.use(mongoSanitize({
 
 const secret= process.env.SECRET || 'thisshouldbeabettersecret';
 
-const store= MongoDBStore.create({
-    url:dbUrl, 
+const store = new MongoDBStore({
+    url: dbUrl,
     secret,
-    touchAfter: 24* 3600
+    touchAfter: 24 * 60 * 60
 });
 
 store.on('error', function(e){
@@ -68,17 +69,21 @@ store.on('error', function(e){
 
 
 //Sesion Setup
-const sessionConfig= {
+
+const sessionConfig = {
     store,
+    name: 'session',
     secret,
     resave: false,
     saveUninitialized: true,
-    cookie:{
+    cookie: {
         httpOnly: true,
-        expires: Date.now() + 1000 * 60 * 60* 24 * 7,
-        maxAge: 1000*60*60*24*7
+        // secure: true,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        maxAge: 1000 * 60 * 60 * 24 * 7
     }
-};
+}
+
 app.use(session(sessionConfig));
 app.use(flash());
 
