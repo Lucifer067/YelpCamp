@@ -3,11 +3,21 @@ const {cloudinary}= require('../cloudinary');
 
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
 const mapBoxToken= process.env.MAPBOX_TOKEN;
+const admin= process.env.ADMIN;
+const admin2= process.env.ADMIN2;
 const geocoder = mbxGeocoding({ accessToken: mapBoxToken });
 
 module.exports.index= async (req, res) => {
-    const campgrounds = await Campground.find({});
-    res.render('campground/index', { campgrounds });
+    const user= req.user;
+    if(user &&(user.id===admin || user.id===admin2)){
+        const campgrounds = await Campground.find({});
+        res.render('campground/index', { campgrounds });  
+    }
+    else{
+        const campgrounds = await Campground.find({"author: {"$nin": [admin, admin2]});
+        res.render('campground/index', { campgrounds });
+    }
+    
 };
 
 module.exports.renderNewForm= (req, res) => {
