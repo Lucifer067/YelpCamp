@@ -14,7 +14,7 @@ module.exports.index= async (req, res) => {
         res.render('campground/index', { campgrounds });  
     }
     else{
-        const campgrounds = await Campground.find({"author: {"$nin": [admin, admin2]});
+        const campgrounds = await Campground.find({"author": {"$nin": [admin, admin2]});
         res.render('campground/index', { campgrounds });
     }
     
